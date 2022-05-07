@@ -1,3 +1,5 @@
+const NUM_METABALLS = 12;
+
 /**
  * Creates and compiles a shader from GLSL source code
  *
@@ -212,6 +214,9 @@ function drawCanvas(
   attributes = [],
   clearColor = { r: 0.0, g: 0.0, b: 0.0, a: 0.0 }
 ) {
+  const WIDTH = gl.canvas.width;
+  const HEIGHT = gl.canvas.height;
+
   const program = makeProgramFromStrings(gl, shaderText);
 
   //
@@ -220,14 +225,40 @@ function drawCanvas(
   createBuffer(gl, program, bufferData, attributes);
 
   // Tell WebGL how to convert from clip space to pixels
-  gl.viewport(0, 0, gl.canvas.width, gl.canvas.height);
+  gl.viewport(0, 0, WIDTH, HEIGHT);
   // clearCanvas(gl, clearColor);
 
   gl.useProgram(program);
 
-  // set up any uniforms
-  const uniformLocation = gl.getUniformLocation(program, "numSquares");
-  gl.uniform1i(uniformLocation, 12);
+  // generate metaballs
+  const metaballs = [];
+
+  const MAX_RADIUS = 80;
+  const MIN_RADIUS = 6;
+
+  for (let i = 0; i < NUM_METABALLS; i++) {
+    const radius = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
+    const x = Math.random() * (WIDTH - 2 * radius) + radius;
+    const y = Math.random() * (HEIGHT - 2 * radius) + radius;
+    console.log(`metaballs[${i}]: (${x}, ${y}), radius: ${radius.toFixed(1)}`);
+    metaballs.push({
+      x: x,
+      y: y,
+      r: radius,
+    });
+  }
+
+  const dataToSendToGPU = new Float32Array(3 * NUM_METABALLS);
+  for (let i = 0; i < NUM_METABALLS; i++) {
+    var baseIndex = 3 * i;
+    let mb = metaballs[i];
+    dataToSendToGPU[baseIndex + 0] = mb.x;
+    dataToSendToGPU[baseIndex + 1] = mb.y;
+    dataToSendToGPU[baseIndex + 2] = mb.r;
+  }
+
+  let uniformLocation = gl.getUniformLocation(program, "metaballs");
+  gl.uniform3fv(uniformLocation, dataToSendToGPU);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
 }
@@ -255,11 +286,26 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const fragmentCode = `  
     precision mediump float;   
-    uniform int numSquares; 
+    const int num = ${NUM_METABALLS};
+    uniform vec3 metaballs[num];
+
    
     void main()
     {
-      gl_FragColor = vec4(gl_FragCoord.x/500.0, gl_FragCoord.y/400.0, 0.5, 1.0);   
+      float x = gl_FragCoord.x;
+      float y = gl_FragCoord.y;
+
+      for (int i = 0; i < num; i++) {
+        vec3 mb = metaballs[i];
+        float dx = mb.x - x;
+        float dy = mb.y - y;
+        float r = mb.z;
+        if (dx*dx + dy*dy < r*r) {
+          gl_FragColor = vec4(x/500.0, y/400.0, 0.5, 1.0);   
+          return;
+        }
+      }
+      gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);  
     }`;
   //
   // Set up buffer data and associated attributes
