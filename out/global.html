@@ -104,7 +104,7 @@
     
 
     
-    <h4 class="name" id="createAttribute"><span class="type-signature"></span>createAttribute<span class="signature">(name, numElements, numVertex, type, offset, typeSize, normalized)</span><span class="type-signature"> &rarr; {<a href="global.html#AttributeObject">AttributeObject</a>}</span></h4>
+    <h4 class="name" id="clearCanvas"><span class="type-signature"></span>clearCanvas<span class="signature">(gl, color)</span><span class="type-signature"></span></h4>
     
 
     
@@ -112,7 +112,7 @@
 
 
 <div class="description">
-    Creates an attribute object from the parameters
+    Clear the canvas with the given color
 </div>
 
 
@@ -148,6 +148,168 @@
 
         <tr>
             
+                <td class="name"><code>gl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">WebGLRenderingContext</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The current WebGL rendering context</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>color</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type"><a href="global.html#ColorObject">ColorObject</a></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Contains floats for r, g, b, and a</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line201">line 201</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="createAttribute"><span class="type-signature"></span>createAttribute<span class="signature">(name, numElements, numVertex, type, offset, typeSize, normalized)</span><span class="type-signature"> &rarr; {<a href="global.html#AttributeObject">AttributeObject</a>}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates an attribute object from the parameters
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+        <th>Default</th>
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
                 <td class="name"><code>name</code></td>
             
 
@@ -162,6 +324,10 @@
 
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">The attribute (variable) name that will be accessed in the GLSL code</td>
@@ -186,6 +352,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">The number of elements for this attribute. Must be 1, 2, 3, or 4.</td>
         </tr>
@@ -209,6 +379,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">Number elements in the full vertex</td>
         </tr>
@@ -223,7 +397,7 @@
             <td class="type">
             
                 
-<span class="param-type">GLenum</span>
+<span class="param-type">string</span>
 
 
             
@@ -231,6 +405,10 @@
 
             
 
+            
+                <td class="default">
+                
+                </td>
             
 
             <td class="description last">Data type of each component: gl.BYTE, gl.SHORT, gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT, gl.FLOAT</td>
@@ -255,6 +433,12 @@
             
 
             
+                <td class="default">
+                
+                    0
+                
+                </td>
+            
 
             <td class="description last">Offset of this attribute in the full vertex</td>
         </tr>
@@ -278,6 +462,10 @@
             
 
             
+                <td class="default">
+                
+                </td>
+            
 
             <td class="description last">size of the data type</td>
         </tr>
@@ -300,6 +488,12 @@
 
             
 
+            
+                <td class="default">
+                
+                    false
+                
+                </td>
             
 
             <td class="description last">If true, integer data values normalized when being cast to a float</td>
@@ -343,7 +537,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line116">line 116</a>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line137">line 137</a>
     </li></ul></dd>
     
 
@@ -617,7 +811,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line145">line 145</a>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line166">line 166</a>
     </li></ul></dd>
     
 
@@ -640,172 +834,6 @@
 
 
 
-
-
-
-
-
-
-
-        
-            
-
-    
-
-    
-    <h4 class="name" id="drawCanvas"><span class="type-signature"></span>drawCanvas<span class="signature">(canvas)</span><span class="type-signature"></span></h4>
-    
-
-    
-
-
-
-<div class="description">
-    Given a canvas element, uses WebGL to draw objects on it
-</div>
-
-
-
-
-
-
-
-
-
-    <h5>Parameters:</h5>
-    
-
-<table class="params">
-    <thead>
-    <tr>
-        
-        <th>Name</th>
-        
-
-        <th>Type</th>
-
-        
-
-        
-
-        <th class="last">Description</th>
-    </tr>
-    </thead>
-
-    <tbody>
-    
-
-        <tr>
-            
-                <td class="name"><code>canvas</code></td>
-            
-
-            <td class="type">
-            
-                
-<span class="param-type">Element</span>
-
-
-            
-            </td>
-
-            
-
-            
-
-            <td class="description last">The canvas to render</td>
-        </tr>
-
-    
-    </tbody>
-</table>
-
-
-
-
-
-
-<dl class="details">
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-
-    
-    <dt class="tag-source">Source:</dt>
-    <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line176">line 176</a>
-    </li></ul></dd>
-    
-
-    
-
-    
-
-    
-</dl>
-
-
-
-
-
-
-
-
-
-
-
-
-
-<h5>Throws:</h5>
-
-        
-
-<dl>
-    <dt>
-        <div class="param-desc">
-        if browser does not support WebGL
-        </div>
-    </dt>
-    <dd></dd>
-    <dt>
-        <dl>
-            <dt>
-                Type
-            </dt>
-            <dd>
-                
-<span class="param-type">Error</span>
-
-
-            </dd>
-        </dl>
-    </dt>
-    <dd></dd>
-</dl>
-
-
-    
 
 
 
@@ -963,7 +991,7 @@
             
                 <td class="default">
                 
-                    true
+                    false
                 
                 </td>
             
@@ -1009,7 +1037,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line42">line 42</a>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line41">line 41</a>
     </li></ul></dd>
     
 
@@ -1202,7 +1230,7 @@
 
             
 
-            <td class="description last">Array of ids names (no # prefix) of the script       tags for the shaders. The first is assumed to be the       vertex shader, the second the fragment shader. Default IDs are vertexShader       and fragmentShader</td>
+            <td class="description last">Array of ids names (no # prefix) of the script       tags for the shaders. The first is assumed to be the       vertex shader, the second the fragment shader.</td>
         </tr>
 
     
@@ -1243,7 +1271,189 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line73">line 73</a>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line87">line 87</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+<h5>Returns:</h5>
+
+        
+<div class="param-desc">
+    A program
+</div>
+
+
+
+<dl>
+    <dt>
+        Type
+    </dt>
+    <dd>
+        
+<span class="param-type">WebGLProgram</span>
+
+
+    </dd>
+</dl>
+
+    
+
+
+
+
+
+        
+            
+
+    
+
+    
+    <h4 class="name" id="makeProgramFromStrings"><span class="type-signature"></span>makeProgramFromStrings<span class="signature">(gl<span class="signature-attributes">non-null</span>, shaderCode)</span><span class="type-signature"> &rarr; (non-null) {WebGLProgram}</span></h4>
+    
+
+    
+
+
+
+<div class="description">
+    Creates a program from 2 script tags.
+</div>
+
+
+
+
+
+
+
+
+
+    <h5>Parameters:</h5>
+    
+
+<table class="params">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>gl</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">WebGLRenderingContext</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">The WebGL Context.</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>shaderCode</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">Array.&lt;string></span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Array of GLSL code for the shaders. The first is assumed to be the       vertex shader, the second the fragment shader.</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line70">line 70</a>
     </li></ul></dd>
     
 
@@ -1448,7 +1658,7 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line16">line 16</a>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line14">line 14</a>
     </li></ul></dd>
     
 
@@ -1758,7 +1968,200 @@
     
     <dt class="tag-source">Source:</dt>
     <dd class="tag-source"><ul class="dummy"><li>
-        <a href="app.js.html">app.js</a>, <a href="app.js.html#line92">line 92</a>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line113">line 113</a>
+    </li></ul></dd>
+    
+
+    
+
+    
+
+    
+</dl>
+
+
+
+
+
+
+            
+                
+<h4 class="name" id="ColorObject">ColorObject</h4>
+
+
+
+
+<div class="description">
+    Description of color object for WebGL color
+</div>
+
+
+
+    <h5>Type:</h5>
+    <ul>
+        <li>
+            
+<span class="param-type">object</span>
+
+
+        </li>
+    </ul>
+
+
+
+
+
+    <h5 class="subsection-title">Properties:</h5>
+
+    
+
+<table class="props">
+    <thead>
+    <tr>
+        
+        <th>Name</th>
+        
+
+        <th>Type</th>
+
+        
+
+        
+
+        <th class="last">Description</th>
+    </tr>
+    </thead>
+
+    <tbody>
+    
+
+        <tr>
+            
+                <td class="name"><code>red</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value of red from 0.0 to 1.0</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>green</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value of green from 0.0 to 1.0</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>blue</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value of blue from 0.0 to 1.0</td>
+        </tr>
+
+    
+
+        <tr>
+            
+                <td class="name"><code>alpha</code></td>
+            
+
+            <td class="type">
+            
+                
+<span class="param-type">number</span>
+
+
+            
+            </td>
+
+            
+
+            
+
+            <td class="description last">Value of alpha from 0.0 to 1.0</td>
+        </tr>
+
+    
+    </tbody>
+</table>
+
+
+
+
+<dl class="details">
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+
+    
+    <dt class="tag-source">Source:</dt>
+    <dd class="tag-source"><ul class="dummy"><li>
+        <a href="square.js.html">square.js</a>, <a href="square.js.html#line103">line 103</a>
     </li></ul></dd>
     
 
@@ -1788,13 +2191,13 @@
 </div>
 
 <nav>
-    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#createAttribute">createAttribute</a></li><li><a href="global.html#createBuffer">createBuffer</a></li><li><a href="global.html#drawCanvas">drawCanvas</a></li><li><a href="global.html#makeProgram">makeProgram</a></li><li><a href="global.html#makeProgramFromScripts">makeProgramFromScripts</a></li><li><a href="global.html#makeShader">makeShader</a></li></ul>
+    <h2><a href="index.html">Home</a></h2><h3>Global</h3><ul><li><a href="global.html#clearCanvas">clearCanvas</a></li><li><a href="global.html#createAttribute">createAttribute</a></li><li><a href="global.html#createBuffer">createBuffer</a></li><li><a href="global.html#makeProgram">makeProgram</a></li><li><a href="global.html#makeProgramFromScripts">makeProgramFromScripts</a></li><li><a href="global.html#makeProgramFromStrings">makeProgramFromStrings</a></li><li><a href="global.html#makeShader">makeShader</a></li></ul>
 </nav>
 
 <br class="clear">
 
 <footer>
-    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Wed May 04 2022 19:54:05 GMT-0600 (Mountain Daylight Time)
+    Documentation generated by <a href="https://github.com/jsdoc/jsdoc">JSDoc 3.6.10</a> on Sat May 07 2022 14:57:31 GMT-0600 (Mountain Daylight Time)
 </footer>
 
 <script> prettyPrint(); </script>
