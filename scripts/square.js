@@ -205,6 +205,7 @@ function clearCanvas(gl, color) {
 
 /** Render canvas when the DOM is loaded and parsed */
 document.addEventListener("DOMContentLoaded", () => {
+  // Get WebGL context from canvas
   canvas = document.querySelector("#mainCanvas");
   canvas.width = WIDTH;
   canvas.height = HEIGHT;
@@ -215,6 +216,7 @@ document.addEventListener("DOMContentLoaded", () => {
     throw new Error("ERROR: browser does not support WebGL");
   }
 
+  // vertex and fragment shader code
   const vertexCode = `   
     precision mediump float;     
     attribute vec2 vertPosition;
@@ -254,44 +256,58 @@ document.addEventListener("DOMContentLoaded", () => {
       }
       gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);  
     }`;
-  //
+
+  // create program by creating shaders from code, attaching
+  // the shaders to the program and linking the program
+  const program = makeProgramFromStrings(gl, [vertexCode, fragmentCode]);
+
+  // Get data ready to transfer to graphics card
+
   // Set up buffer data and associated attributes
-  //
   // prettier-ignore
   const bufferData = new Float32Array([
     // X, Y,       R, G, B
-      -1.0,  1.0,  // top left 1.0, 1.0, 0.0, 
-      -1.0, -1.0,  // bottom left 0.7, 0.0, 1.0, 
-       1.0,  1.0,  // top right 0.1, 1.0, 0.6,
-       1.0, -1.0,  // bottom right 1.0, 0.0, 0.0, 
+      -1.0,  1.0,  // top left
+      -1.0, -1.0,  // bottom left 
+       1.0,  1.0,  // top right
+       1.0, -1.0,  // bottom right
   ]);
 
   const attributes = new Array(
     // vertPosition is 2 elements in a 2 element vertex of type float
     createAttribute("vertPosition", 2, 2, gl.FLOAT)
-
-    // vertColor is 3 elements in a 5 element vertex beginning at offset [2]
-    // createAttribute("vertColor", 3, 5, "float", 2)
   );
 
-  const program = makeProgramFromStrings(gl, [vertexCode, fragmentCode]);
-
-  //
   // Create buffer from buffer data and attributes
-  //
   createBuffer(gl, program, bufferData, attributes);
-
-  // Tell WebGL how to convert from clip space to pixels
-  gl.viewport(0, 0, WIDTH, HEIGHT);
-  // clearCanvas(gl, clearColor);
 
   gl.useProgram(program);
 
   // generate metaballs
+  const uniformData = generateCircleUniformData(NUM_METABALLS, {
+    max: 7,
+    min: 90,
+  });
+
+  let uniformLocation = gl.getUniformLocation(program, "metaballs");
+  gl.uniform3fv(uniformLocation, uniformData);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+});
+
+/**
+ * Generates a requested number of random circles with the max radius equal to
+ * WIDTH/radiusLimits.max and the minRadius WIDTH/radiusLimits.min
+ * @param {number} numCircles The number of circles to generate
+ * @param {Object} radiusLimits Contains min and max values to determine the
+ *                              min and max radius relative to the canvas width
+ * @returns {Float32Array} Of circle info
+ */
+function generateCircleUniformData(numCircles, radiusLimits) {
   const metaballs = [];
 
-  const MAX_RADIUS = WIDTH / 7;
-  const MIN_RADIUS = 6;
+  const MAX_RADIUS = WIDTH / radiusLimits.max;
+  const MIN_RADIUS = WIDTH / radiusLimits.min;
 
   for (let i = 0; i < NUM_METABALLS; i++) {
     const radius = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
@@ -304,17 +320,14 @@ document.addEventListener("DOMContentLoaded", () => {
     });
   }
 
-  const dataToSendToGPU = new Float32Array(3 * NUM_METABALLS);
+  const uniformData = new Float32Array(3 * NUM_METABALLS);
   for (let i = 0; i < NUM_METABALLS; i++) {
     var baseIndex = 3 * i;
     let mb = metaballs[i];
-    dataToSendToGPU[baseIndex + 0] = mb.x;
-    dataToSendToGPU[baseIndex + 1] = mb.y;
-    dataToSendToGPU[baseIndex + 2] = mb.r;
+    uniformData[baseIndex + 0] = mb.x;
+    uniformData[baseIndex + 1] = mb.y;
+    uniformData[baseIndex + 2] = mb.r;
   }
 
-  let uniformLocation = gl.getUniformLocation(program, "metaballs");
-  gl.uniform3fv(uniformLocation, dataToSendToGPU);
-
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-});
+  return uniformData;
+}
