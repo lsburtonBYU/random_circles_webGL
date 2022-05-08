@@ -1,31 +1,107 @@
+/**
+ * Number of circles to generate
+ * @constant {number}
+ */
 const NUM_CIRCLES = 12;
-const WIDTH = 800;
-const HEIGHT = 600;
+
+/** Render canvas when the DOM is loaded and parsed */
+document.addEventListener("DOMContentLoaded", () => {
+  // Get WebGL context from canvas
+  canvas = document.querySelector("#mainCanvas");
+  const WIDTH = canvas.offsetWidth;
+  const HEIGHT = canvas.offsetHeight;
+  //TODO better adjustment than this....
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
+
+  const gl = canvas.getContext("webgl");
+
+  if (!gl) {
+    throw new Error("ERROR: browser does not support WebGL");
+  }
+
+  // vertex and fragment shader code
+  const vertexCode = `   
+    precision mediump float;     
+    attribute vec2 vertPosition;
+    
+    void main()
+    {
+      gl_Position = vec4(vertPosition, 0.0, 1.0);
+    }`;
+
+  const fragmentCode = `  
+    precision mediump float;   
+    const int num = ${NUM_CIRCLES};
+    uniform vec3 circles[num];
+
+   
+    void main()
+    {
+      float x = gl_FragCoord.x;
+      float y = gl_FragCoord.y;
+
+      for (int i = 0; i < num; i++) {
+        vec3 circle = circles[i];
+        float r = circle.z;
+
+        // check bounding box, then check if inside circle; rely on 
+        // short circuiting to reduce calculations for points outside circle
+        if (x > circle.x - r && x < circle.x + r 
+            && y > circle.y - r && y < circle.y + r
+            && (circle.x - x)*(circle.x - x) + (circle.y - y)*(circle.y - y) < r*r ) {
+          gl_FragColor = vec4(x/${WIDTH}.0, y/${HEIGHT}.0, 0.5, 1.0);   
+          return;
+        }
+      }
+      // background color
+      gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);  
+    }`;
+
+  // create program by creating shaders from code, attaching
+  // the shaders to the program and linking the program
+  const program = makeProgramFromStrings(gl, [vertexCode, fragmentCode]);
+
+  // Get data ready to transfer to graphics card
+
+  // Set up buffer data and associated attributes
+  // prettier-ignore
+  const bufferData = new Float32Array([
+    // X, Y,       R, G, B
+      -1.0,  1.0,  // top left
+      -1.0, -1.0,  // bottom left 
+       1.0,  1.0,  // top right
+       1.0, -1.0,  // bottom right
+  ]);
+
+  const attributes = new Array(
+    // vertPosition is 2 elements in a 2 element vertex of type float
+    createAttribute("vertPosition", 2, 2, gl.FLOAT)
+  );
+
+  // Create buffer from buffer data and attributes
+  createBuffer(gl, program, bufferData, attributes);
+
+  gl.useProgram(program);
+
+  // generate circles with 3 float values each
+  const uniformData = generateCircleUniformData(
+    NUM_CIRCLES,
+    {
+      max: 5,
+      min: 50,
+    },
+    { width: WIDTH, height: HEIGHT }
+  );
+
+  let uniformLocation = gl.getUniformLocation(program, "circles");
+  gl.uniform3fv(uniformLocation, uniformData);
+
+  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
+});
 
 /**
- * Description of color object for WebGL color
- *
- * @typedef {object} ColorObject
- * @property {number} red Value of red from 0.0 to 1.0
- * @property {number} green Value of green from 0.0 to 1.0
- * @property {number} blue Value of blue from 0.0 to 1.0
- * @property {number} alpha Value of alpha from 0.0 to 1.0
- */
-
-/**
- * Description of attribute object
- *
- * @typedef {object} AttributeObject
- * @property {string} name the name of the attribute to be used in the GLSL code
- * @property {number} size the number of elements for this attribute; must be 1,2,3, or 4
- * @property {number} stride the size in bytes of one full vertex
- * @property {number} offset the offset in bytes of this attribute in the full vertex
- * @property {number} type Data type of each component: gl.BYTE, gl.SHORT, gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT, gl.FLOAT
- * @property {boolean} normalized If true, integer data values normalized when being cast to a float
- */
-
-/**
- * Utility to create and compile a shader from GLSL source code
+ * Create and compile a shader from GLSL source code string
  *
  * @param {!WebGLRenderingContext } gl The current WebGL rendering context
  * @param {!string} shaderSource The shader source code text in GLSL
@@ -177,117 +253,32 @@ function clearCanvas(gl, color) {
   gl.clear(gl.COLOR_BUFFER_BIT);
 }
 
-/** Render canvas when the DOM is loaded and parsed */
-document.addEventListener("DOMContentLoaded", () => {
-  // Get WebGL context from canvas
-  canvas = document.querySelector("#mainCanvas");
-  canvas.width = WIDTH;
-  canvas.height = HEIGHT;
-
-  const gl = canvas.getContext("webgl");
-
-  if (!gl) {
-    throw new Error("ERROR: browser does not support WebGL");
-  }
-
-  // vertex and fragment shader code
-  const vertexCode = `   
-    precision mediump float;     
-    attribute vec2 vertPosition;
-    
-    void main()
-    {
-      gl_Position = vec4(vertPosition, 0.0, 1.0);
-    }`;
-
-  const fragmentCode = `  
-    precision mediump float;   
-    const int num = ${NUM_CIRCLES};
-    uniform vec3 circles[num];
-
-   
-    void main()
-    {
-      float x = gl_FragCoord.x;
-      float y = gl_FragCoord.y;
-
-      for (int i = 0; i < num; i++) {
-        vec3 mb = circles[i];
-        float dx = mb.x - x;
-        float dy = mb.y - y;
-        float r = mb.z;
-
-        float minX = mb.x - r;
-        float maxX = mb.x + r;
-        float minY = mb.y - r;
-        float maxY = mb.y + r;
-
-        // check bounding box, then check if inside circle
-        if (x > minX && x < maxX && y > minY && y < maxY && dx*dx + dy*dy < r*r ) {
-          gl_FragColor = vec4(x/${WIDTH}.0, y/${HEIGHT}.0, 0.5, 1.0);   
-          return;
-        }
-      }
-      gl_FragColor = vec4(0.9, 0.9, 0.9, 1.0);  
-    }`;
-
-  // create program by creating shaders from code, attaching
-  // the shaders to the program and linking the program
-  const program = makeProgramFromStrings(gl, [vertexCode, fragmentCode]);
-
-  // Get data ready to transfer to graphics card
-
-  // Set up buffer data and associated attributes
-  // prettier-ignore
-  const bufferData = new Float32Array([
-    // X, Y,       R, G, B
-      -1.0,  1.0,  // top left
-      -1.0, -1.0,  // bottom left 
-       1.0,  1.0,  // top right
-       1.0, -1.0,  // bottom right
-  ]);
-
-  const attributes = new Array(
-    // vertPosition is 2 elements in a 2 element vertex of type float
-    createAttribute("vertPosition", 2, 2, gl.FLOAT)
-  );
-
-  // Create buffer from buffer data and attributes
-  createBuffer(gl, program, bufferData, attributes);
-
-  gl.useProgram(program);
-
-  // generate circles with 3 float values each
-  const uniformData = generateCircleUniformData(NUM_CIRCLES, {
-    max: 7,
-    min: 90,
-  });
-
-  let uniformLocation = gl.getUniformLocation(program, "circles");
-  gl.uniform3fv(uniformLocation, uniformData);
-
-  gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
-});
-
 /**
- * Generates a requested number of random circles with the max radius equal to
- * WIDTH/radiusLimits.max and the min radius WIDTH/radiusLimits.min
+ * Generates a requested number of random circles. Given sizeLimit is
+ * the smaller dimension of canvas width and height, the the max
+ * radius equals 1/radiusLimits.max * sizeLimit and the min radius is
+ * 1/radiusLimits.min * sizeLimit
  * @param {number} numCircles The number of circles to generate
  * @param {Object} radiusLimits Contains min and max values to determine the
  *                              min and max radius relative to the canvas width
+ * @param canvasDimension {object} width and height of canvas
  * @returns {Float32Array} Of circle info, (x, y) = center, z = radius
  */
-function generateCircleUniformData(numCircles, radiusLimits) {
+function generateCircleUniformData(numCircles, radiusLimits, canvasDimensions) {
   const CIRCLE_ELEMENTS = 3;
   const circles = [];
+  const sizeLimit =
+    canvasDimensions.width < canvasDimensions.height
+      ? canvasDimensions.width
+      : canvasDimensions.height;
 
-  const MAX_RADIUS = WIDTH / radiusLimits.max;
-  const MIN_RADIUS = WIDTH / radiusLimits.min;
+  const MAX_RADIUS = sizeLimit / radiusLimits.max;
+  const MIN_RADIUS = sizeLimit / radiusLimits.min;
 
   for (let i = 0; i < numCircles; i++) {
     const radius = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
-    const x = Math.random() * (WIDTH - 2 * radius) + radius;
-    const y = Math.random() * (HEIGHT - 2 * radius) + radius;
+    const x = Math.random() * (canvasDimensions.width - 2 * radius) + radius;
+    const y = Math.random() * (canvasDimensions.height - 2 * radius) + radius;
     circles.push({
       x: x,
       y: y,
@@ -306,3 +297,25 @@ function generateCircleUniformData(numCircles, radiusLimits) {
 
   return uniformData;
 }
+
+/**
+ * Description of color object for WebGL color
+ *
+ * @typedef {object} ColorObject
+ * @property {number} red Value of red from 0.0 to 1.0
+ * @property {number} green Value of green from 0.0 to 1.0
+ * @property {number} blue Value of blue from 0.0 to 1.0
+ * @property {number} alpha Value of alpha from 0.0 to 1.0
+ */
+
+/**
+ * Description of attribute object
+ *
+ * @typedef {object} AttributeObject
+ * @property {string} name the name of the attribute to be used in the GLSL code
+ * @property {number} size the number of elements for this attribute; must be 1,2,3, or 4
+ * @property {number} stride the size in bytes of one full vertex
+ * @property {number} offset the offset in bytes of this attribute in the full vertex
+ * @property {number} type Data type of each component: gl.BYTE, gl.SHORT, gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT, gl.FLOAT
+ * @property {boolean} normalized If true, integer data values normalized when being cast to a float
+ */
