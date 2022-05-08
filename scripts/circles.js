@@ -84,7 +84,7 @@ document.addEventListener("DOMContentLoaded", () => {
 
   gl.useProgram(program);
 
-  gl.viewport(0, 0, canvas.width, canvas.height);
+  // gl.viewport(0, 0, canvas.width, canvas.height);
 
   // generate circles with 3 float values each
   const uniformData = generateCircleUniformData(
