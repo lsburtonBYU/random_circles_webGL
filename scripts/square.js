@@ -240,7 +240,14 @@ document.addEventListener("DOMContentLoaded", () => {
         float dx = mb.x - x;
         float dy = mb.y - y;
         float r = mb.z;
-        if (dx*dx + dy*dy < r*r) {
+
+        float minX = mb.x - r;
+        float maxX = mb.x + r;
+        float minY = mb.y - r;
+        float maxY = mb.y + r;
+
+        // check bounding box, then check if inside circle
+        if (x > minX && x < maxX && y > minY && y < maxY && dx*dx + dy*dy < r*r ) {
           gl_FragColor = vec4(x/${WIDTH}.0, y/${HEIGHT}.0, 0.5, 1.0);   
           return;
         }
