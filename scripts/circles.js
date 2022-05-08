@@ -11,8 +11,8 @@ document.addEventListener("DOMContentLoaded", () => {
   const WIDTH = canvas.offsetWidth;
   const HEIGHT = canvas.offsetHeight;
   //TODO better adjustment than this....
-  canvas.width = WIDTH;
-  canvas.height = HEIGHT;
+  canvas.width = Math.floor(WIDTH * window.devicePixelRatio);
+  canvas.height = Math.floor(HEIGHT * window.devicePixelRatio);
 
   const gl = canvas.getContext("webgl");
 
@@ -84,11 +84,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   gl.useProgram(program);
 
+  gl.viewport(0, 0, canvas.width, canvas.height);
+
   // generate circles with 3 float values each
   const uniformData = generateCircleUniformData(
     NUM_CIRCLES,
     {
-      max: 5,
+      max: 4,
       min: 50,
     },
     { width: WIDTH, height: HEIGHT }
