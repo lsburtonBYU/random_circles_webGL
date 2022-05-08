@@ -1,9 +1,31 @@
-const NUM_METABALLS = 12;
+const NUM_CIRCLES = 12;
 const WIDTH = 800;
 const HEIGHT = 600;
 
 /**
- * Creates and compiles a shader from GLSL source code
+ * Description of color object for WebGL color
+ *
+ * @typedef {object} ColorObject
+ * @property {number} red Value of red from 0.0 to 1.0
+ * @property {number} green Value of green from 0.0 to 1.0
+ * @property {number} blue Value of blue from 0.0 to 1.0
+ * @property {number} alpha Value of alpha from 0.0 to 1.0
+ */
+
+/**
+ * Description of attribute object
+ *
+ * @typedef {object} AttributeObject
+ * @property {string} name the name of the attribute to be used in the GLSL code
+ * @property {number} size the number of elements for this attribute; must be 1,2,3, or 4
+ * @property {number} stride the size in bytes of one full vertex
+ * @property {number} offset the offset in bytes of this attribute in the full vertex
+ * @property {number} type Data type of each component: gl.BYTE, gl.SHORT, gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT, gl.FLOAT
+ * @property {boolean} normalized If true, integer data values normalized when being cast to a float
+ */
+
+/**
+ * Utility to create and compile a shader from GLSL source code
  *
  * @param {!WebGLRenderingContext } gl The current WebGL rendering context
  * @param {!string} shaderSource The shader source code text in GLSL
@@ -16,7 +38,6 @@ function makeShader(gl, shaderSource, shaderType) {
   gl.shaderSource(shader, shaderSource);
   gl.compileShader(shader);
   if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-    // gl.deleteShader(shader);
     throw new Error(
       `ERROR compiling ${
         shaderType === gl.VERTEX_SHADER ? "vertex" : "fragment"
@@ -27,8 +48,8 @@ function makeShader(gl, shaderSource, shaderType) {
 }
 
 /**
- * Creates a WebGLProgram, attaches a vertex and a fragment shader, then links
- * the program, with the option to validate the program.
+ * Create a WebGLProgram, attach a vertex and a fragment shader,
+ * then link the program, with the option to validate the program.
  *
  * @param {!WebGLRenderingContext } gl The current WebGL rendering context
  * @param {!WebGLShader} vertexShader A compiled vertex shader
@@ -60,7 +81,7 @@ function makeProgram(gl, vertexShader, fragmentShader, validate = false) {
 }
 
 /**
- * Creates a program from 2 script tags.
+ * Create a WebGL program from 2 strings containing GLSL code.
  *
  * @param {!WebGLRenderingContext} gl The WebGL Context.
  * @param {string[]} shaderCode Array of GLSL code for the shaders. The first is assumed to be the
@@ -76,54 +97,7 @@ function makeProgramFromStrings(gl, shaderCode) {
 }
 
 /**
- * Creates a program from 2 script tags.
- *
- * @param {!WebGLRenderingContext} gl The WebGL Context.
- * @param {string[]} shaderIds Array of ids names (no # prefix) of the script
- *        tags for the shaders. The first is assumed to be the
- *        vertex shader, the second the fragment shader.
- * @return {!WebGLProgram} A program
- */
-function makeProgramFromScripts(gl, shaderIds) {
-  const vertexShader = makeShader(
-    gl,
-    document.querySelector(`#${shaderIds[0]}`).textContent,
-    gl.VERTEX_SHADER
-  );
-
-  const fragmentShader = makeShader(
-    gl,
-    document.querySelector(`#${shaderIds[1]}`).textContent,
-    gl.FRAGMENT_SHADER
-  );
-
-  return makeProgram(gl, vertexShader, fragmentShader);
-}
-
-/**
- * Description of color object for WebGL color
- *
- * @typedef {object} ColorObject
- * @property {number} red Value of red from 0.0 to 1.0
- * @property {number} green Value of green from 0.0 to 1.0
- * @property {number} blue Value of blue from 0.0 to 1.0
- * @property {number} alpha Value of alpha from 0.0 to 1.0
- */
-
-/**
- * Description of attribute object
- *
- * @typedef {object} AttributeObject
- * @property {string} name the name of the attribute to be used in the GLSL code
- * @property {number} size the number of elements for this attribute; must be 1,2,3, or 4
- * @property {number} stride the size in bytes of one full vertex
- * @property {number} offset the offset in bytes of this attribute in the full vertex
- * @property {number} type Data type of each component: gl.BYTE, gl.SHORT, gl.UNSIGNED_BYTE, gl.UNSIGNED_SHORT, gl.FLOAT
- * @property {boolean} normalized If true, integer data values normalized when being cast to a float
- */
-
-/**
- * Creates an attribute object from the parameters
+ * Create an attribute object from the parameters
  *
  * @param {string} name The attribute (variable) name that will be accessed in the GLSL code
  * @param {number} numElements The number of elements for this attribute. Must be 1, 2, 3, or 4.
@@ -228,8 +202,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   const fragmentCode = `  
     precision mediump float;   
-    const int num = ${NUM_METABALLS};
-    uniform vec3 metaballs[num];
+    const int num = ${NUM_CIRCLES};
+    uniform vec3 circles[num];
 
    
     void main()
@@ -238,7 +212,7 @@ document.addEventListener("DOMContentLoaded", () => {
       float y = gl_FragCoord.y;
 
       for (int i = 0; i < num; i++) {
-        vec3 mb = metaballs[i];
+        vec3 mb = circles[i];
         float dx = mb.x - x;
         float dy = mb.y - y;
         float r = mb.z;
@@ -283,13 +257,13 @@ document.addEventListener("DOMContentLoaded", () => {
 
   gl.useProgram(program);
 
-  // generate metaballs
-  const uniformData = generateCircleUniformData(NUM_METABALLS, {
+  // generate circles with 3 float values each
+  const uniformData = generateCircleUniformData(NUM_CIRCLES, {
     max: 7,
     min: 90,
   });
 
-  let uniformLocation = gl.getUniformLocation(program, "metaballs");
+  let uniformLocation = gl.getUniformLocation(program, "circles");
   gl.uniform3fv(uniformLocation, uniformData);
 
   gl.drawArrays(gl.TRIANGLE_STRIP, 0, 4);
@@ -297,36 +271,37 @@ document.addEventListener("DOMContentLoaded", () => {
 
 /**
  * Generates a requested number of random circles with the max radius equal to
- * WIDTH/radiusLimits.max and the minRadius WIDTH/radiusLimits.min
+ * WIDTH/radiusLimits.max and the min radius WIDTH/radiusLimits.min
  * @param {number} numCircles The number of circles to generate
  * @param {Object} radiusLimits Contains min and max values to determine the
  *                              min and max radius relative to the canvas width
- * @returns {Float32Array} Of circle info
+ * @returns {Float32Array} Of circle info, (x, y) = center, z = radius
  */
 function generateCircleUniformData(numCircles, radiusLimits) {
-  const metaballs = [];
+  const CIRCLE_ELEMENTS = 3;
+  const circles = [];
 
   const MAX_RADIUS = WIDTH / radiusLimits.max;
   const MIN_RADIUS = WIDTH / radiusLimits.min;
 
-  for (let i = 0; i < NUM_METABALLS; i++) {
+  for (let i = 0; i < numCircles; i++) {
     const radius = Math.random() * (MAX_RADIUS - MIN_RADIUS) + MIN_RADIUS;
     const x = Math.random() * (WIDTH - 2 * radius) + radius;
     const y = Math.random() * (HEIGHT - 2 * radius) + radius;
-    metaballs.push({
+    circles.push({
       x: x,
       y: y,
       r: radius,
     });
   }
 
-  const uniformData = new Float32Array(3 * NUM_METABALLS);
-  for (let i = 0; i < NUM_METABALLS; i++) {
-    var baseIndex = 3 * i;
-    let mb = metaballs[i];
-    uniformData[baseIndex + 0] = mb.x;
-    uniformData[baseIndex + 1] = mb.y;
-    uniformData[baseIndex + 2] = mb.r;
+  const uniformData = new Float32Array(CIRCLE_ELEMENTS * numCircles);
+  for (let i = 0; i < NUM_CIRCLES; i++) {
+    var baseIndex = CIRCLE_ELEMENTS * i;
+    let circle = circles[i];
+    uniformData[baseIndex + 0] = circle.x;
+    uniformData[baseIndex + 1] = circle.y;
+    uniformData[baseIndex + 2] = circle.r;
   }
 
   return uniformData;
