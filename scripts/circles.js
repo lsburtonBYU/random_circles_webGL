@@ -8,11 +8,11 @@ const NUM_CIRCLES = 12;
 document.addEventListener("DOMContentLoaded", () => {
   // Get WebGL context from canvas
   canvas = document.querySelector("#mainCanvas");
-  const WIDTH = canvas.offsetWidth;
-  const HEIGHT = canvas.offsetHeight;
+  const WIDTH = Math.floor(canvas.offsetWidth * window.devicePixelRatio);
+  const HEIGHT = Math.floor(canvas.offsetHeight * window.devicePixelRatio);
   //TODO better adjustment than this....
-  canvas.width = Math.floor(WIDTH * window.devicePixelRatio);
-  canvas.height = Math.floor(HEIGHT * window.devicePixelRatio);
+  canvas.width = WIDTH;
+  canvas.height = HEIGHT;
 
   const gl = canvas.getContext("webgl");
 
